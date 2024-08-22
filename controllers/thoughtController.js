@@ -67,6 +67,7 @@ module.exports = {
             if (!thought) {
                 res.status(404).json({message: 'No thought found with the specified ID.'})
             }
+            res.json(thought)
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -84,6 +85,7 @@ module.exports = {
             if (!thought) {
                 res.status(404).json({message: 'No thought found with the specified ID.'})
             }
+            res.json({message: 'Reaction added!'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -101,6 +103,7 @@ module.exports = {
             if (!thought) {
                 res.status(404).json({message: 'No thought found with the specified ID.'})
             }
+            res.json({message: 'Reaction deleted!'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);

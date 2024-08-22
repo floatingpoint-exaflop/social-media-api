@@ -61,12 +61,13 @@ module.exports = {
         try {
             const user = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $set: req.body },
+                req.body,
                 { runValidators: true, new: true },
             )
             if (!user) {
                 res.status(404).json({message: 'No user found with the specified ID.'})
             }
+            res.json(user)
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -84,6 +85,7 @@ module.exports = {
             if (!user) {
                 res.status(404).json({message: 'No user found with the specified ID.'})
             }
+            res.json({message: 'Friend added!'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -101,6 +103,7 @@ module.exports = {
             if (!user) {
                 res.status(404).json({message: 'No user found with the specified ID.'})
             }
+            res.json({message: 'Friend removed!'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
