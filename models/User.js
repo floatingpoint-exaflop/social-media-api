@@ -26,13 +26,30 @@ const userSchema = new Schema(
                 ref: 'user'
             }
         ]
+    },
+    {
+        toJSON: {
+            getters: true,
+            virtuals: true
+        },
+        toObject: {
+            getters: true,
+            virtuals: true
+        }
     }
 );
 
+//used above to confirm user email.
 function validateEmail(email) {
     const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i;
     return regex.test(email);
 }
+
+//gets a count of the user's friends.
+userSchema.virtual('friendCount')
+    .get(function() {
+        return this.friends.length;
+    });
 
 const User = model('user', userSchema);
 module.exports = User;
