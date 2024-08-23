@@ -32,14 +32,14 @@ module.exports = {
     async createUser(req, res) {
         try {
             const user = await User.create(req.body);
-            res.json(user);
+            res.json({message: 'New User Created!', user: user})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
           }
     },
 
-    //delete one user and their thoughts
+    //delete one user and their thoughts, and their reactions, and their association with any friends.
     async deleteUser(req, res) {
         try {
             const user = await User.findOneAndDelete({
@@ -49,14 +49,22 @@ module.exports = {
                 return res.status(404).json({message: 'No user found with the specified ID.'})
             }
             await Thought.deleteMany({ _id: { $in: user.usedId}});
-            res.json({message: 'This user and all their posted thoughts have been deleted.'})
+            await User.updateMany(
+                { friends: req.params.userId },
+                { $pull: { friends: req.params.userId }}
+            )
+            await Thought.updateMany(
+                { 'reactions.username': user.username },
+                { $pull: { reactions: { username: user.username }}}
+            )
+            res.json({message: 'This user and all their posted thoughts and reactions have been deleted. They also have been removed from all other user friend lists.', user: user})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
           }
     },
 
-    //update a user
+    //update a user, including fixing their username on reactions.
     async updateUser(req, res) {
         try {
             const user = await User.findOneAndUpdate(
@@ -67,7 +75,18 @@ module.exports = {
             if (!user) {
                 res.status(404).json({message: 'No user found with the specified ID.'})
             }
-            res.json(user)
+            if (req.body.username) {
+                await Thought.updateMany(
+                    { username: user.username },
+                    { $set: { username: req.body.username }},
+                );
+                await Thought.updateMany(
+                    { 'reactions.username': user.username },
+                    { $set: { 'reactions.$[elem].username': req.body.username }},
+                    { arrayFilters: [{'elem.username': user.username}]}
+                );
+            }
+            res.json({message: 'This user has been updated.', user: user})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -75,36 +94,52 @@ module.exports = {
     },
 
 
-    //add a friend for a user
+    //add a :friendId 'UserB' for a :userId 'UserA', and vice versa (this is really how most old school social networks functioned, like an AIM BuddyList!)
     async addFriend(req, res) {
         try {
-            const user = await User.findOneAndUpdate(
+            const userA = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 { $addToSet: {friends: req.params.friendId} },
                 { runValidators: true, new: true },
             )
-            if (!user) {
+            if (!userA) {
                 res.status(404).json({message: 'No user found with the specified ID.'})
             }
-            res.json({message: 'Friend added!'})
+            const userB = await User.findOneAndUpdate(
+                { _id: req.params.friendId },
+                { $addToSet: {friends: req.params.userId} },
+                { runValidators: true, new: true }
+            )
+            if (!userB) {
+                res.status(404).json({message: 'No friend available with the specified ID.'})
+            }
+            res.json({message: 'My new best friend!'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
           }
     },
     
-    //remove a friend from a user
+    //remove a :friendId 'UserB' from a :userId 'UserA', and vice versa (If this were followers, I wouldn't do that; it would be easy to add followers as a separate list of associated people where it isn't automatically reciprocal though.)
     async removeFriend(req, res) {
         try {
-            const user = await User.findOneAndUpdate(
+            const userA = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 { $pull: {friends: req.params.friendId }},
                 { runValidators: true, new: true },
             )
-            if (!user) {
+            if (!userA) {
                 res.status(404).json({message: 'No user found with the specified ID.'})
             }
-            res.json({message: 'Friend removed!'})
+            const userB = await User.findOneAndUpdate(
+                { _id: req.params.friendId },
+                { $pull: {friends: req.params.userId} },
+                { runValidators: true, new: true }
+            )
+            if (!userB) {
+                res.status(404).json({message: 'No friend available with the specified ID.'})
+            }
+            res.json({message: 'Friendship over!'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
