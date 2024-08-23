@@ -1,4 +1,4 @@
-const { Thought, Reaction } = require('../models');
+const { Thought, Reaction, User } = require('../models');
 
 module.exports = {
     //get all thoughts
@@ -32,6 +32,12 @@ module.exports = {
     async createThought(req, res) {
         try {
             const thought = await Thought.create(req.body);
+            const newUser = await User.findByIdAndUpdate(
+                req.body.userId,
+                { $push: { thoughts: thought._id}},
+                {new: true}
+            );
+            console.log(newUser)
             res.json(thought);
         } catch (err) {
             console.log(err);
@@ -96,7 +102,7 @@ module.exports = {
         try {
             const thought = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
-                { $pull: {reactions: {reactionId: req.params.reactionId }}},
+                { $pull: {reactions: {_id: req.params.reactionId }}},
                 { runValidators: true, new: true },
             )
             if (!thought) {
@@ -105,6 +111,7 @@ module.exports = {
             if (thought.reactions.some(reaction => reaction.reactionId.toString() === req.params.reactionId)) {
                 return res.status(500).json({ message: 'Reaction could not be deleted.' });
             }
+            console.log(thought)
             res.json({message: 'Reaction deleted!'})
         } catch (err) {
             console.log(err);

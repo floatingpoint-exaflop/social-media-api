@@ -4,7 +4,7 @@ module.exports = {
     //get all users
     async getUsers(req, res) {
         try {
-            const users = await User.find();
+            const users = await User.find().populate('thoughts');
             res.json(users);
         } catch (err) {
             console.log(err);
@@ -17,7 +17,7 @@ module.exports = {
         try {
             const user = await User.findOne({
                 _id: req.params.userId
-            }).select('-__v');
+            }).populate('thoughts');
             if (!user) {
                 return res.status(404).json({message: 'No user found with the specified ID.'})
             }
@@ -48,7 +48,7 @@ module.exports = {
             if (!user) {
                 return res.status(404).json({message: 'No user found with the specified ID.'})
             }
-            await Thought.deleteMany({ _id: { $in: user.thoughts}});
+            await Thought.deleteMany({ _id: { $in: user.usedId}});
             res.json({message: 'This user and all their posted thoughts have been deleted.'})
         } catch (err) {
             console.log(err);
@@ -74,18 +74,6 @@ module.exports = {
           }
     },
 
-    async getFriends(req, res) {
-        try {
-            const user = await User.findOne({ _id: req.params.userId }).populate('friends', '-__v');
-            if (!user) {
-                return res.status(404).json({ message: 'No user found with the specified ID.' });
-            }
-            res.json(user.friends);
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json(err);
-        }
-    },
 
     //add a friend for a user
     async addFriend(req, res) {
