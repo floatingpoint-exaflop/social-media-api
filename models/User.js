@@ -35,7 +35,7 @@ const userSchema = new Schema(
         toObject: {
             getters: true,
             virtuals: true
-        }
+        },
     }
 );
 

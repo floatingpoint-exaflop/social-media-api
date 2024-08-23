@@ -28,7 +28,7 @@ const reactionSchema = new Schema(
         },
         toObject: {
             getters: true
-        }
+        },
     }
 );
 

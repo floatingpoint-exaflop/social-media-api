@@ -48,8 +48,7 @@ module.exports = {
             if (!thought) {
                 return res.status(404).json({message: 'No thought found with the specified ID.'})
             }
-            await Reaction.deleteMany({ _id: { $in: thought.reactions}});
-            res-json({message: 'This thought and all its posted reactions have been deleted.'})
+            res.json({message: 'This thought and all its posted reactions have been deleted.'})
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -102,6 +101,9 @@ module.exports = {
             )
             if (!thought) {
                 res.status(404).json({message: 'No thought found with the specified ID.'})
+            }
+            if (thought.reactions.some(reaction => reaction.reactionId.toString() === req.params.reactionId)) {
+                return res.status(500).json({ message: 'Reaction could not be deleted.' });
             }
             res.json({message: 'Reaction deleted!'})
         } catch (err) {

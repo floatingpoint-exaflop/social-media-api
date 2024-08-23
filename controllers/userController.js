@@ -74,12 +74,25 @@ module.exports = {
           }
     },
 
+    async getFriends(req, res) {
+        try {
+            const user = await User.findOne({ _id: req.params.userId }).populate('friends', '-__v');
+            if (!user) {
+                return res.status(404).json({ message: 'No user found with the specified ID.' });
+            }
+            res.json(user.friends);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    },
+
     //add a friend for a user
     async addFriend(req, res) {
         try {
             const user = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $addToSet: {friends: req.body} },
+                { $addToSet: {friends: req.params.friendId} },
                 { runValidators: true, new: true },
             )
             if (!user) {
@@ -97,7 +110,7 @@ module.exports = {
         try {
             const user = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $pull: {friends: {friendId: req.params.friendId}}},
+                { $pull: {friends: req.params.friendId }},
                 { runValidators: true, new: true },
             )
             if (!user) {
