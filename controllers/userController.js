@@ -64,34 +64,45 @@ module.exports = {
           }
     },
 
-    //update a user, including fixing their username on reactions.
+    //update a user, someday I will figure out fixing their username on reactions.
     async updateUser(req, res) {
         try {
             const user = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 req.body,
-                { runValidators: true, new: true },
-            )
+                { runValidators: true, new: true }
+            );
+    
             if (!user) {
-                res.status(404).json({message: 'No user found with the specified ID.'})
+                return res.status(404).json({ message: 'No user found with the specified ID.' });
             }
-            if (req.body.username) {
-                await Thought.updateMany(
-                    { username: user.username },
-                    { $set: { username: req.body.username }},
-                );
-                await Thought.updateMany(
-                    { 'reactions.username': user.username },
-                    { $set: { 'reactions.$[elem].username': req.body.username }},
-                    { arrayFilters: [{'elem.username': user.username}]}
-                );
-            }
-            res.json({message: 'This user has been updated.', user: user})
+    
+            // if (req.body.username) {
+            //     console.log(`Old username: ${user.username}, New username: ${req.body.username}`);
+                
+            //     // Update username in thoughts
+            //     const thoughts = await Thought.updateMany(
+            //         { username: user.username },
+            //         { $set: { username: req.body.username } }
+            //     );
+            //     console.log(`Thoughts updated: ${thoughts.nModified}`);
+                
+            //     // Update username in reactions
+            //     const reactions = await Thought.updateMany(
+            //         { 'reactions.username': user.username },
+            //         { $set: { 'reactions.$[elem].username': req.body.username } },
+            //         { arrayFilters: [{ 'elem.username': user.username }] }
+            //     );
+            //     console.log(`Reactions updated: ${reactions.nModified}`);
+            // }
+    
+            res.json({ message: 'This user has been updated.', user: user });
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
-          }
+        }
     },
+    
 
 
     //add a :friendId 'UserB' for a :userId 'UserA', and vice versa (this is really how most old school social networks functioned, like an AIM BuddyList!)

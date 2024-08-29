@@ -30,7 +30,7 @@
   [A video tutorial for using social-media-api](sfd)
 
   ## Contributing
-  If you want to contribute to this project - particularly if you know how I might enhance it to include live chats or seeing if your friends are online, see my contact info in the Questions section below. Don’t hesitate to reach out! I am a beginner at this stuff but always hungry to learn from others in the community.
+  If you want to contribute to this project - particularly if you know how I might enhance it to include live chats or seeing if your friends are online, see my contact info in the Questions section below. Don’t hesitate to reach out! I am a beginner at this stuff but always hungry to learn from others in the community. I know for sure that I want to refactor the db a bit and link thoughts and reactions to users by id instead of by username, as it would allow usernames to be updated on those elements if the user updates theirs.
 
   ## Tests
   This app is best tested using nodemon and postman for just the GET/POST/PUT/DELETE API calls. There is no front-end for us to run it on yet.
