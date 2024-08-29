@@ -27,7 +27,7 @@
   2. In Postman, import the included postman.json file found in the project root.
   3. In Postman, hit the routes using the included url params and body requests.
 
-  [A video tutorial for using social-media-api](sfd)
+  [A video tutorial for using social-media-api](https://drive.google.com/file/d/16UVmYWlXtH21wuHsdT9cbQuRyhN9uMjD/view?usp=sharing)
 
   ## Contributing
   If you want to contribute to this project - particularly if you know how I might enhance it to include live chats or seeing if your friends are online, see my contact info in the Questions section below. Don’t hesitate to reach out! I am a beginner at this stuff but always hungry to learn from others in the community. I know for sure that I want to refactor the db a bit and link thoughts and reactions to users by id instead of by username, as it would allow usernames to be updated on those elements if the user updates theirs.
